@@ -18,7 +18,7 @@ def splitn(axis, n, rands, box):
     binSize = float(1) / (n-1);
     splits = [min]
     for x in range(n-1):
-        u = (x + rands[x] * 0.4 + 0.3) * binSize
+        u = (x + rands[x]) * binSize
         # u = random.uniform((x + 0.3) * binSize, (x+0.7) * binSize) # get random parametrization along axis
         offset = min + common.compMul3(box.size, axis * u)
         splits.append(offset)

@@ -8,3 +8,4 @@ def divide(parent, size, iter):
     top = shapes[1]
 
     parent.setAttribValue("active", 0)
+    # GEO.deletePoints([parent])

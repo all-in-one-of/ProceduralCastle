@@ -14,11 +14,13 @@ reload(city)
 
 from city import initial
 from city import stack
+from city import keep
 reload(initial)
 reload(stack)
+reload(keep)
 
 SEED = inputs[1].evalParm("seed")
-TYPES = ["initial", "level0", "tall", "box"]
+TYPES = ["initial", "level0", "tall", "box", "keep", "tower_lower", "tower_upper", "dontkeep", "destroy"]
 POINT_GROUPS = {}
 AXES = [hou.Vector3(1,0,0), hou.Vector3(0,1,0), hou.Vector3(0,0,1)]
 GENERATIONS = inputs[1].evalParm("generations")
@@ -35,7 +37,7 @@ except hou.OperationFailed:
 
 try:
     geo.addAttrib(hou.attribType.Point, "size", hou.Vector3(10,10,10))
-except hou.OperationFailed:
+except:
     pass
 
 try:
@@ -53,8 +55,8 @@ for t in TYPES:
 
 for point in geo.points():
     point.setAttribValue("origin", point.position())
-    point.setAttribValue("type", "initial")
-    POINT_GROUPS["initial"].add(point)
+    point.setAttribValue("type", "keep")
+    POINT_GROUPS["keep"].add(point)
 
 
 def makeSeed(*args):
@@ -63,21 +65,41 @@ def makeSeed(*args):
         seed = seed + abs(arg) + 2 # avoid getting 1's and 0's
     return seed * SEED
 
+def nothing(parent, size, iter):
+    pass
+
+def deactivate(parent, size, iter):
+    parent.setAttribValue("active", 0)
+
+def destroy(parent, size, iter):
+    # geo.deletePoints([parent])
+    parent.setAttribValue("active", 0)
+    parent.setAttribValue("type", "destroy")
+
 RULES = {
-    "initial": [initial.initializeGroups],
+    "initial": [],
+    # "initial": [(1, initial.initializeGroups)],
     "level0": [],
-    "tall": [stack.divide],
-    "box": []
+    "tall": [],
+    "box": [],
+    "keep": [(inputs[1].evalParm("keep_divide"), keep.divide), (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), (inputs[1].evalParm("keep_deactivate"), deactivate), (inputs[1].evalParm("keep_destroy"), destroy)],
+    "tower_lower": [],
+    "tower_upper": [],
+    "dontkeep": [(inputs[1].evalParm("dontkeep_tower"), keep.tower), (inputs[1].evalParm("dontkeep_deactivate"), deactivate)]
 }
 
 def replacePoint(parent, size, iter):
     random.seed(makeSeed(parent.number(), iter))
     t = point.attribValue("type")
     if t in RULES and point.attribValue("active"):
+        u = random.random()
         if len(RULES[t]):
-            op = random.choice(RULES[t])
-            new_pts = op(parent, size, iter)
-
+            i = 0
+            cumul = 0
+            while (u > RULES[t][i][0] + cumul):
+                cumul += RULES[t][i][0]
+                i += 1
+            RULES[t][i][1](parent, size, iter)
 
 for iter in range(GENERATIONS):
     points = geo.points()[:]
