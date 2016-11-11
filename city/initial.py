@@ -37,9 +37,9 @@ def initializeGroups(parent, size, iter):
     #         if u < 0.1:
     #             continue
     #         newHeight = zshape.size[1] * u
-    #         newSize = HOU.Vector3(zshape.size)
-    #         newSize[1] = newHeight
-    #         yshape = split.Shape(center=zshape.center + HOU.Vector3(0,newHeight/2,0), size=newSize)
+    #         newsize = HOU.Vector3(zshape.size)
+    #         newsize[1] = newHeight
+    #         yshape = split.Shape(center=zshape.center + HOU.Vector3(0,newHeight/2,0), size=newsize)
 
     #         p = common.createPoint(parent)
     #         p.setPosition(yshape.center)
@@ -50,12 +50,12 @@ def initializeGroups(parent, size, iter):
     #         else:
     #             p.setAttribValue("type", "tall")
 
-    def spawnBox(parentSize, parentCenter):
+    def spawnBox(parentsize, parentCenter):
         u = random.random()
         newHeight = size[1] * u
-        newSize = HOU.Vector3(parentSize)
-        newSize[1] = newHeight
-        s = split.Shape(center=parentCenter + HOU.Vector3(0,newHeight/2,0), size=newSize)
+        newsize = HOU.Vector3(parentsize)
+        newsize[1] = newHeight
+        s = split.Shape(center=parentCenter + HOU.Vector3(0,newHeight/2,0), size=newsize)
 
         p = common.createPoint(parent)
         p.setPosition(s.center)

@@ -15,24 +15,26 @@ reload(city)
 from city import initial
 from city import stack
 from city import keep
+from city import decorate
 reload(initial)
 reload(stack)
 reload(keep)
+reload(decorate)
 
 SEED = inputs[1].evalParm("seed")
-TYPES = ["initial", "level0", "tall", "box", "keep", "tower_lower", "tower_upper", "dontkeep", "destroy"]
+TYPES = ["initial", "level0", "tall", "box", "keep", "tower_lower", "tower_upper", "dontkeep", "destroy", "wall", "wall_top"]
 POINT_GROUPS = {}
 AXES = [hou.Vector3(1,0,0), hou.Vector3(0,1,0), hou.Vector3(0,0,1)]
 GENERATIONS = inputs[1].evalParm("generations")
 
 try:
     geo.addAttrib(hou.attribType.Point, "active", 1)
-except hou.OperationFailed:
+except:
     pass
 
 try:
     geo.addAttrib(hou.attribType.Point, "Cd", hou.Vector3(1,1,1))
-except hou.OperationFailed:
+except:
     pass
 
 try:
@@ -42,13 +44,24 @@ except:
 
 try:
     geo.addAttrib(hou.attribType.Point, "type", "box")
-except hou.OperationFailed:
+except:
     pass
 
 try:
     geo.addAttrib(hou.attribType.Point, "origin", hou.Vector3(0,0,0))
-except hou.OperationFailed:
+except:
     pass
+
+try:
+    geo.addAttrib(hou.attribType.Point, "up", hou.Vector3(0,1,0))
+except:
+    pass
+
+try:
+    geo.addAttrib(hou.attribType.Point, "N", hou.Vector3(0,0,1))
+except:
+    pass
+
 
 for t in TYPES:
     POINT_GROUPS[t] = geo.createPointGroup(t)
@@ -101,11 +114,17 @@ def replacePoint(parent, size, iter):
                 i += 1
             RULES[t][i][1](parent, size, iter)
 
+def decoratePoint(point):
+    pass
+
 for iter in range(GENERATIONS):
     points = geo.points()[:]
     
     for point in points:
         replacePoint(point, hou.Vector3(point.attribValue("size")), iter)
+
+for point in geo.points():
+    decorate.decorate(point)
 
 for point in geo.points():
     t = point.attribValue("type")

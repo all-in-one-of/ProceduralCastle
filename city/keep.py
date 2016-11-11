@@ -68,8 +68,8 @@ def tower(parent, size, iter):
 
       ratio = size[0] / size[2]
       if (0.8 < ratio and ratio < 1.2):
-        s.size[0] *= 0.75
-        s.size[2] *= 0.75
+        s.size[0] = int(s.size[0] * 0.75)
+        s.size[2] = int(s.size[2] * 0.75)
         p.setAttribValue("size", s.size)
         p.setPosition(s.center)
       else:
@@ -80,8 +80,8 @@ def tower(parent, size, iter):
           s.center[2] -= size[2]/4
           s.size[2] /= 2
         
-        s.size[0] *= 0.75
-        s.size[2] *= 0.75
+        s.size[0] = int(s.size[0] * 0.75)
+        s.size[2] = int(s.size[2] * 0.75)
 
         p.setAttribValue("size", s.size)
         p.setPosition(s.center)
