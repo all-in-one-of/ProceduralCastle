@@ -2,7 +2,7 @@ import common
 import math
 reload(common)
 
-def decorate(point):
+def decorateWithWalls(point):
   size = HOU.Vector3(point.attribValue("size"))
   center = HOU.Vector3(point.position())
   min = center - size / 2
@@ -61,4 +61,34 @@ def decorate(point):
       setTypes(p1)
       setTypes(p2)
 
-  GEO.deletePoints([point])
+  # GEO.deletePoints([point])
+
+def decorateSpire(point):
+  size = HOU.Vector3(point.attribValue("size"))
+  center = HOU.Vector3(point.position())
+  min = center - size / 2
+  max = center + size / 2
+
+  N = GEO.findPointAttrib("N")
+
+  # iterate over floors
+  for y in range(int(size[1])):
+    y_center = min[1] + y + 0.5
+
+    p = common.createPoint(point)
+    p.setPosition((center[0], y_center, center[2]))
+    p.setAttribValue('size', (size[0], 1.0, size[2]))
+    t = point.attribValue('type')
+    if (t == 'spire_upper'):
+      p.setAttribValue('type', 'spire_segment')
+    else:
+      p.setAttribValue('type', 'spire_connection')
+
+def decorate(point):
+  t = point.attribValue('type')
+  if (t == 'keep' or t == 'dontkeep' or t == 'tower_lower' or t == 'tower_upper'):
+    decorateWithWalls(point)
+  elif ("spire" in t):
+    decorateSpire(point)
+  else:
+    p = common.createPoint(point)

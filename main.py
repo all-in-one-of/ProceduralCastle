@@ -15,14 +15,16 @@ reload(city)
 from city import initial
 from city import stack
 from city import keep
+from city import spire
 from city import decorate
 reload(initial)
 reload(stack)
 reload(keep)
+reload(spire)
 reload(decorate)
 
 SEED = inputs[1].evalParm("seed")
-TYPES = ["initial", "level0", "tall", "box", "keep", "tower_lower", "tower_upper", "dontkeep", "destroy", "wall", "wall_top"]
+TYPES = ["initial", "level0", "tall", "box", "keep", "tower_lower", "tower_upper", "dontkeep", "destroy", "wall", "wall_top", "spire_lower", "spire_upper", "spire_segment", "spire_connection"]
 POINT_GROUPS = {}
 AXES = [hou.Vector3(1,0,0), hou.Vector3(0,1,0), hou.Vector3(0,0,1)]
 GENERATIONS = inputs[1].evalParm("generations")
@@ -95,9 +97,9 @@ RULES = {
     "level0": [],
     "tall": [],
     "box": [],
-    "keep": [(inputs[1].evalParm("keep_divide"), keep.divide), (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), (inputs[1].evalParm("keep_deactivate"), deactivate), (inputs[1].evalParm("keep_destroy"), destroy)],
+    "keep": [(inputs[1].evalParm("keep_divide"), keep.divide), (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), (inputs[1].evalParm("keep_deactivate"), deactivate), (inputs[1].evalParm("keep_destroy"), destroy), (inputs[1].evalParm("keep_spire"), spire.spire)],
     "tower_lower": [],
-    "tower_upper": [],
+    "tower_upper": [(1, spire.spire)],
     "dontkeep": [(inputs[1].evalParm("dontkeep_tower"), keep.tower), (inputs[1].evalParm("dontkeep_deactivate"), deactivate)]
 }
 
@@ -123,8 +125,10 @@ for iter in range(GENERATIONS):
     for point in points:
         replacePoint(point, hou.Vector3(point.attribValue("size")), iter)
 
-for point in geo.points():
+points = geo.points()[:]
+for point in points:
     decorate.decorate(point)
+geo.deletePoints(points)
 
 for point in geo.points():
     t = point.attribValue("type")

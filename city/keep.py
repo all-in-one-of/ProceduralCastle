@@ -92,3 +92,4 @@ def tower(parent, size, iter):
 
 def dontkeep(parent, size, iter):
   parent.setAttribValue("type", "dontkeep")
+
