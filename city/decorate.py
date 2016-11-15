@@ -60,8 +60,20 @@ def decorateWithWalls(point):
 
       setTypes(p1)
       setTypes(p2)
+  
+  # build ceiling
+  for x in range(int(size[0])):
+    x_pos = min[0] + x + 0.5
+    x_offset = (size[0] - math.floor(size[0])) / 2.0
+    
+    for z in range(int(size[2])):
+      z_pos = min[2] + z + 0.5
+      z_offset = ((max[2] - min[2]) - math.floor(max[2] - min[2])) / 2.0
 
-  # GEO.deletePoints([point])
+      p = common.createPoint(point)
+      p.setPosition((x_pos + x_offset, max[1], z_pos + z_offset))
+      p.setAttribValue('size', (1.0, 0.1, 1.0))
+
 
 def decorateSpire(point):
   size = HOU.Vector3(point.attribValue("size"))

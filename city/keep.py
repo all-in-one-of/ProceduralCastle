@@ -86,8 +86,6 @@ def tower(parent, size, iter):
         p.setAttribValue("size", s.size)
         p.setPosition(s.center)
 
-
-
   GEO.deletePoints([parent])
 
 def dontkeep(parent, size, iter):
