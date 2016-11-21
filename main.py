@@ -16,15 +16,34 @@ from city import initial
 from city import stack
 from city import keep
 from city import spire
+from city import classify
 from city import decorate
 reload(initial)
 reload(stack)
 reload(keep)
 reload(spire)
+reload(classify)
 reload(decorate)
 
 SEED = inputs[1].evalParm("seed")
-TYPES = ["initial", "level0", "tall", "box", "keep", "tower_lower", "tower_upper", "dontkeep", "destroy", "wall", "wall_top", "spire_lower", "spire_upper", "spire_segment", "spire_connection"]
+TYPES = [
+    "initial", 
+    "level0", 
+    "tall", 
+    "box", 
+    "keep", 
+    "tower_lower", 
+    "tower_upper", 
+    "dontkeep", 
+    "destroy", 
+    "wall1",
+    "wall2",
+    "wall3", 
+    "wall_top", 
+    "spire_lower", 
+    "spire_upper", 
+    "spire_segment", 
+    "spire_connection"]
 POINT_GROUPS = {}
 AXES = [hou.Vector3(1,0,0), hou.Vector3(0,1,0), hou.Vector3(0,0,1)]
 GENERATIONS = inputs[1].evalParm("generations")
@@ -46,6 +65,16 @@ except:
 
 try:
     geo.addAttrib(hou.attribType.Point, "type", "box")
+except:
+    pass
+
+try:
+    geo.addAttrib(hou.attribType.Point, "building", "generic")
+except:
+    pass
+
+try:
+    geo.addAttrib(hou.attribType.Point, "hasSpire", 0)
 except:
     pass
 
@@ -97,9 +126,9 @@ RULES = {
     "level0": [],
     "tall": [],
     "box": [],
-    "keep": [(inputs[1].evalParm("keep_divide"), keep.divide), (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), (inputs[1].evalParm("keep_deactivate"), deactivate), (inputs[1].evalParm("keep_destroy"), destroy), (inputs[1].evalParm("keep_spire"), spire.spire)],
+    "keep": [(inputs[1].evalParm("keep_divide"), keep.divide), (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), (inputs[1].evalParm("keep_deactivate"), deactivate), (inputs[1].evalParm("keep_destroy"), destroy)],
     "tower_lower": [],
-    "tower_upper": [(1, spire.spire)],
+    "tower_upper": [],
     "dontkeep": [(inputs[1].evalParm("dontkeep_tower"), keep.tower), (inputs[1].evalParm("dontkeep_deactivate"), deactivate)]
 }
 
@@ -111,10 +140,13 @@ def replacePoint(parent, size, iter):
         if len(RULES[t]):
             i = 0
             cumul = 0
-            while (u > RULES[t][i][0] + cumul):
-                cumul += RULES[t][i][0]
-                i += 1
-            RULES[t][i][1](parent, size, iter)
+            try:
+                while (u > RULES[t][i][0] + cumul):
+                    cumul += RULES[t][i][0]
+                    i += 1
+                RULES[t][i][1](parent, size, iter)
+            except IndexError:
+                raise IndexError(RULES[t])
 
 def decoratePoint(point):
     pass
@@ -124,6 +156,13 @@ for iter in range(GENERATIONS):
     
     for point in points:
         replacePoint(point, hou.Vector3(point.attribValue("size")), iter)
+
+points = geo.points()[:]
+for point in points:
+    spire.makeSpires(point)
+
+for point in geo.points():
+    classify.classifyBuildings(point)
 
 points = geo.points()[:]
 for point in points:

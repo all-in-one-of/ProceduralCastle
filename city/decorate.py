@@ -1,5 +1,6 @@
 import common
 import math
+import random
 reload(common)
 
 def decorateWithWalls(point):
@@ -11,8 +12,7 @@ def decorateWithWalls(point):
   WALL_WIDTH = 0.2
   N = GEO.findPointAttrib("N")
 
-  # iterate over floors
-  for y in range(int(size[1])):
+  def buildFloor(y, height):
     y_center = min[1] + y + 0.5
 
     def setTypes(p):
@@ -21,7 +21,7 @@ def decorateWithWalls(point):
           p.setAttribValue('type', 'wall_top')
       else:
         if p is not None:
-          p.setAttribValue('type', 'wall')
+          p.setAttribValue('type', 'wall' + str(height))
 
     for x in range(int(size[0])):
       x_pos = min[0] + x + 0.5
@@ -60,6 +60,23 @@ def decorateWithWalls(point):
 
       setTypes(p1)
       setTypes(p2)
+  
+  
+  # iterate over floors
+  y = 0
+  floorHeight = 3
+  while y < int(size[1]) - 1:
+    while floorHeight > int(size[1]) - 1 - y:
+      floorHeight -= 1
+    
+    if floorHeight > 1 and random.random() < y / size[1]:
+      floorHeight = random.choice([r + 1 for r in range(floorHeight)])
+
+    buildFloor(y, floorHeight)
+    y += floorHeight
+
+  buildFloor(int(size[1]) - 1, 1)
+  
   
   # build ceiling
   for x in range(int(size[0])):

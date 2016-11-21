@@ -7,7 +7,7 @@ reload(common)
 def spire(parent, size, iter):
   SPIRE_WIDTH = 2
   N = GEO.findPointAttrib("N")
-  if (size[0] > SPIRE_WIDTH and size[2] > SPIRE_WIDTH):
+  if (size[0] > SPIRE_WIDTH and size[2] > SPIRE_WIDTH and not parent.attribValue('hasSpire')):
     
     xaxis = HOU.Vector3(1,0,0)
     yaxis = HOU.Vector3(0,1,0)
@@ -49,7 +49,10 @@ def spire(parent, size, iter):
     p1 = common.createPoint(parent)
     p1.setPosition(boxShapes[0].center)
     p1.setAttribValue("size", boxShapes[0].size)
+    # p1.setPosition(boxBlock.center)
+    # p1.setAttribValue("size", boxBlock.size)
     p1.setAttribValue("active", 0)
+    p1.setAttribValue("hasSpire", 1)
 
     # p2 = common.createPoint(parent)
     # p2.setPosition(boxShapes[1].center)
@@ -73,3 +76,8 @@ def spire(parent, size, iter):
     p4.setAttribValue(N, norm)
 
     GEO.deletePoints([parent])
+
+def makeSpires(point):
+  t = point.attribValue('type')
+  if (t == 'keep' or t == 'dontkeep' or t == 'tower_upper'):
+    spire(point, HOU.Vector3(point.attribValue('size')), 0)

@@ -1,0 +1,3 @@
+
+def classifyBuildings(point):
+  pass
