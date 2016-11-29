@@ -69,7 +69,7 @@ def decorateWithWalls(point):
     while floorHeight > int(size[1]) - 1 - y:
       floorHeight -= 1
     
-    if floorHeight > 1 and random.random() < y / size[1]:
+    if floorHeight > 1 and random.random() < math.sqrt(y / size[1]):
       floorHeight = random.choice([r + 1 for r in range(floorHeight)])
 
     buildFloor(y, floorHeight)
@@ -113,11 +113,27 @@ def decorateSpire(point):
     else:
       p.setAttribValue('type', 'spire_connection')
 
+def decorateArchTower(point):
+  size = HOU.Vector3(point.attribValue("size"))
+  center = HOU.Vector3(point.position())
+  _min = center - size / 2
+  _max = center + size / 2
+
+  for y in range(0,6,2):
+    y_center = _min[1] + y + max(0, int(size[1]) - 6) + 0.5
+
+    p = common.createPoint(point)
+    p.setPosition((center[0], y_center, center[2]))
+    p.setAttribValue('size', (1.0, 1.0, 1.0))
+    p.setAttribValue('type', 'arch')
+
 def decorate(point):
   t = point.attribValue('type')
-  if (t == 'keep' or t == 'dontkeep' or t == 'tower_lower' or t == 'tower_upper'):
+  if (t == 'keep' or t == 'dontkeep' or t == 'tower_lower' or t == 'tower_upper' or t == 'terminal_keep'):
     decorateWithWalls(point)
   elif ("spire" in t):
     decorateSpire(point)
+  elif (t == 'arch_tower'):
+    decorateArchTower(point)
   else:
     p = common.createPoint(point)

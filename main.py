@@ -18,12 +18,14 @@ from city import keep
 from city import spire
 from city import classify
 from city import decorate
+from city import arch
 reload(initial)
 reload(stack)
 reload(keep)
 reload(spire)
 reload(classify)
 reload(decorate)
+reload(arch)
 
 SEED = inputs[1].evalParm("seed")
 TYPES = [
@@ -43,7 +45,12 @@ TYPES = [
     "spire_lower", 
     "spire_upper", 
     "spire_segment", 
-    "spire_connection"]
+    "spire_connection",
+    "arch",
+    "arch_tower",
+    "terminal_keep"]
+
+# Set of output houdini groups to be created
 POINT_GROUPS = {}
 AXES = [hou.Vector3(1,0,0), hou.Vector3(0,1,0), hou.Vector3(0,0,1)]
 GENERATIONS = inputs[1].evalParm("generations")
@@ -97,6 +104,7 @@ except:
 for t in TYPES:
     POINT_GROUPS[t] = geo.createPointGroup(t)
 
+# Store original geometry attributes
 for point in geo.points():
     point.setAttribValue("origin", point.position())
     point.setAttribValue("type", "keep")
@@ -126,12 +134,27 @@ RULES = {
     "level0": [],
     "tall": [],
     "box": [],
-    "keep": [(inputs[1].evalParm("keep_divide"), keep.divide), (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), (inputs[1].evalParm("keep_deactivate"), deactivate), (inputs[1].evalParm("keep_destroy"), destroy)],
+    "keep": [
+        (inputs[1].evalParm("keep_divide"), keep.divide), 
+        (inputs[1].evalParm("keep_dontkeep"), keep.dontkeep), 
+        (inputs[1].evalParm("keep_deactivate"), deactivate), 
+        (inputs[1].evalParm("keep_destroy"), destroy)
+    ],
     "tower_lower": [],
     "tower_upper": [],
-    "dontkeep": [(inputs[1].evalParm("dontkeep_tower"), keep.tower), (inputs[1].evalParm("dontkeep_deactivate"), deactivate)]
+    "dontkeep": [
+        (inputs[1].evalParm("dontkeep_tower"), keep.tower), 
+        (inputs[1].evalParm("dontkeep_deactivate"), deactivate),
+        (inputs[1].evalParm("dontkeep_arch"), arch.makeArch)
+    ],
+    "terminal_keep": [
+        # (inputs[1].evalParm("dontkeep_tower"), keep.tower),
+    ],
+    "arch": [],
+    "arch_tower": []
 }
 
+# Apply a rule to this point based on type. Generates output points
 def replacePoint(parent, size, iter):
     random.seed(makeSeed(parent.number(), iter))
     t = point.attribValue("type")
@@ -146,24 +169,34 @@ def replacePoint(parent, size, iter):
                     i += 1
                 RULES[t][i][1](parent, size, iter)
             except IndexError:
-                raise IndexError(RULES[t])
+                pass
+                # raise IndexError(RULES[t])
 
 def decoratePoint(point):
     pass
 
+# Replace points for GENERATIONS iterations
 for iter in range(GENERATIONS):
     points = geo.points()[:]
     
     for point in points:
         replacePoint(point, hou.Vector3(point.attribValue("size")), iter)
 
+# Make spires appear
 points = geo.points()[:]
 for point in points:
     spire.makeSpires(point)
 
-for point in geo.points():
-    classify.classifyBuildings(point)
+# TODO classify buildings of different types
+# for point in geo.points():
+    # classify.classifyBuildings(point)
 
+points = geo.points()[:]
+for point in points:
+    # do arch things
+    pass
+
+# Generate appropriate wall points
 points = geo.points()[:]
 for point in points:
     decorate.decorate(point)

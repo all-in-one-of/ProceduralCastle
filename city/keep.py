@@ -49,6 +49,9 @@ def tower(parent, size, iter):
   dist = round(0.5 * axisLength)
   u = dist / axisLength
 
+  if size[0]*size[2] > 30:
+    return
+
   # Take current parent shape and split into 2 bins
   shapes = split.splitn(axis, 2, [u], split.Shape(center=parent.position(), size=size))
 
@@ -89,5 +92,7 @@ def tower(parent, size, iter):
   GEO.deletePoints([parent])
 
 def dontkeep(parent, size, iter):
+  if size[0]*size[2] > 36:
+    return
   parent.setAttribValue("type", "dontkeep")
 
