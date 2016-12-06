@@ -79,17 +79,21 @@ def decorateWithWalls(point):
   
   
   # build ceiling
-  for x in range(int(size[0])):
-    x_pos = min[0] + x + 0.5
-    x_offset = (size[0] - math.floor(size[0])) / 2.0
+  # for x in range(int(size[0])):
+  #   x_pos = min[0] + x + 0.5
+  #   x_offset = (size[0] - math.floor(size[0])) / 2.0
     
-    for z in range(int(size[2])):
-      z_pos = min[2] + z + 0.5
-      z_offset = ((max[2] - min[2]) - math.floor(max[2] - min[2])) / 2.0
+  #   for z in range(int(size[2])):
+  #     z_pos = min[2] + z + 0.5
+  #     z_offset = ((max[2] - min[2]) - math.floor(max[2] - min[2])) / 2.0
 
-      p = common.createPoint(point)
-      p.setPosition((x_pos + x_offset, max[1], z_pos + z_offset))
-      p.setAttribValue('size', (1.0, 0.1, 1.0))
+  #     p = common.createPoint(point)
+  #     p.setPosition((x_pos + x_offset, max[1], z_pos + z_offset))
+  #     p.setAttribValue('size', (1.0, 0.1, 1.0))
+  ceiling = common.createPoint(point)
+  ceiling.setPosition((point.position()[0], max[1], point.position()[2]))
+  ceiling.setAttribValue('size', (size[0], 1.0, size[2]))
+  ceiling.setAttribValue('type', 'roof')
 
 
 def decorateSpire(point):
@@ -109,7 +113,10 @@ def decorateSpire(point):
     p.setAttribValue('size', (size[0], 1.0, size[2]))
     t = point.attribValue('type')
     if (t == 'spire_upper'):
-      p.setAttribValue('type', 'spire_segment')
+      if y == int(size[1]) - 1:
+        p.setAttribValue('type', 'spire_segment_top')
+      else:
+        p.setAttribValue('type', 'spire_segment')
     else:
       p.setAttribValue('type', 'spire_connection')
 

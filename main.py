@@ -45,10 +45,12 @@ TYPES = [
     "spire_lower", 
     "spire_upper", 
     "spire_segment", 
+    "spire_segment_top",
     "spire_connection",
     "arch",
     "arch_tower",
-    "terminal_keep"]
+    "terminal_keep",
+    "roof"]
 
 # Set of output houdini groups to be created
 POINT_GROUPS = {}
